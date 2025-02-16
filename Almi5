@@ -1,0 +1,34 @@
+import simnibs
+from simnibs import sim_struct
+import os
+
+# Create a SimNIBS simulation session
+s = sim_struct.SESSION()
+s.fnamehead = 'almi5_head.msh'  # Ensure this mesh exists in the working directory
+s.pathfem = './simnibs_output'  # Output folder
+s.fields = 'e'  # Compute electric field (E-field)
+
+# Define TMS coil and position
+tms = s.add_tmslist()
+tms.fnamecoil = 'Magstim_70mm_Fig8.ccd'  # Standard TMS coil model
+tms.pos_ydir = [0, 1, 0]  # Align coil Y-direction
+tms.pos_xdir = [1, 0, 0]  # Align coil X-direction
+tms.distance = 2.0  # Distance from the scalp (in mm)
+tms.magn = 1.0  # Current intensity (A/m²)
+
+# Target position in M1 (hand knob area, EEG C3 location)
+tms.target_pos = [-40, -20, 80]  # Adjust based on actual MRI data
+tms.map_to_surf = True  # Ensures the coil is placed on the cortical surface
+
+# Assign tissue conductivity values (optional)
+s.cond = {'gm': 0.276, 'wm': 0.126, 'csf': 1.79, 'skull': 0.01, 'scalp': 0.465}
+
+# Define the simulation subfolder
+s.subpath = 'almi5_tms_sim'
+s.fnamehead = 'almi5_head.msh'  # Ensure the head model is correct
+
+# Run the simulation directly instead of writing a script
+s.run()
+
+print("✅ SimNIBS TMS simulation completed.")
+print("Results saved in ./simnibs_output/")
